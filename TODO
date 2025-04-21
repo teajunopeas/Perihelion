@@ -1,0 +1,88 @@
+# TODO List para el Proyecto Juego de Empresas (Python)
+# Basado en la estructura v2 y el timeline propuesto.
+
+# --- Fase 1: Implementación de la Dinámica Central (Matriz de Markov) ---
+
+## Actualización de Matriz Markov (simulation.py / company.py)
+[ ] Implementar lógica efecto Precio (PVP) en Matriz Markov (fórmulas delta_p, m_ii, redistribución, normalización) [Ref: PDF Sec 4.1.2.1]
+[ ] Implementar lógica efecto Marketing en Matriz Markov (fórmula logarítmica, m_l, M_l, k_m, redistribución, normalización) [Ref: PDF Sec 4.1.2.2]
+[ ] Implementar lógica efecto Tecnología (Ventas) en Matriz Markov (fórmula hiperbólica/lineal, m_l, T_l, k_tv, redistribución, normalización) [Ref: PDF Sec 4.1.2.3]
+[ ] Asegurar que la normalización de columnas de la matriz (suma 1, valores 0-1) sea robusta tras cada actualización.
+
+## Actualización de Estado Empresa (company.py / simulation.py)
+[ ] Implementar lógica efecto Tecnología (Costes) en Coste Variable (CV) (fórmula logarítmica delta_c, c_l, T_l, k_tc) [Ref: PDF Sec 4.1.2.3]
+[ ] Asegurar que `Company.coste_variable` se actualice correctamente.
+
+## Integración (simulation.py)
+[ ] Modificar `Simulation._update_markov_matrix` para llamar a las funciones de efectos (Precio, MKT, Tech) basadas en las decisiones del mes.
+[ ] Modificar `Simulation.run_step` para obtener/simular decisiones antes de llamar a `_update_markov_matrix`.
+
+
+# --- Fase 2: Interacción del Usuario y Gestión de Datos ---
+
+## Decisiones Interactivas (main.py / simulation.py / input_utils.py)
+[ ] Implementar la solicitud interactiva de decisiones al usuario para cada empresa en cada mes:
+    [ ] Nuevo PVP
+    [ ] Inversión en Marketing
+    [ ] Inversión en Mejoras Tecnológicas
+    [ ] Unidades a producir (mejorar `Company.decidir_produccion`)
+[ ] Usar un módulo como `input_utils.py` para validaciones robustas de entrada.
+[ ] Pasar las decisiones del usuario a la lógica de actualización de estado (Markov, CV) y cálculo de costes.
+
+## Configuración (main.py / config_data.py / file_manager.py?)
+[ ] (Opcional) Permitir cargar la configuración inicial de la simulación y las empresas desde un archivo externo (JSON, YAML) en lugar de solo `config_data.py`.
+
+## Persistencia (file_manager.py / main.py)
+[ ] Implementar `save_game`: guardar el estado completo de `Simulation` y todos los objetos `Company` (atributos, matrices, mes actual) [Ref: PDF Req Inicial].
+[ ] Implementar `load_game`: restaurar el estado completo desde un archivo guardado [Ref: PDF Req Inicial].
+[ ] Integrar las opciones de Guardar/Cargar en el flujo de `main.py`.
+
+
+# --- Fase 3: Refinamiento de Mecánicas y Reportes ---
+
+## Mecánicas de Simulación (simulation.py / company.py)
+[ ] Implementar fluctuación de la demanda total del mercado (`Simulation._update_market_demand`) [Ref: PDF Ejemplo 1901].
+[ ] Implementar cálculo completo y aplicación del coste de almacenamiento (`CALM`) basado en stock final [Ref: PDF Sec 4.1.2.4].
+[ ] Implementar cálculo completo y aplicación del coste de ruptura (`CRUPT`) si `ruptadm == 2` [Ref: PDF Sec 4.1.2.4].
+[ ] Implementar cálculo completo y aplicación del coste de no servicio (`CNOSERV`) si `ruptadm == 1` [Ref: PDF Sec 4.1.2.4].
+[ ] Implementar lógica de ventas pendientes (`VENTASPENDIENTES`) si `ruptadm == 1` [Ref: PDF Sec 4.1.2.4].
+
+## Reportes y Visualización (reporting.py / main.py)
+[ ] Mejorar `print_final_results` para mostrar resultados acumulados (beneficio total, ventas totales, etc.) [Ref: PDF Req Inicial].
+[ ] Añadir gráficos (`matplotlib`) para visualizar evolución temporal de métricas (presupuesto, stock, cuota mercado).
+[ ] (Opcional) Formatear la salida de `print_monthly_results` para asemejarse a las tablas del PDF.
+
+
+# --- Fase 4: Pruebas, Documentación y Entrega ---
+
+## Pruebas
+[ ] Escribir pruebas unitarias (ej: `pytest`) para funciones críticas:
+    [ ] Cálculo de equilibrio (`_calculate_equilibrium`).
+    [ ] Implementación de fórmulas de efectos (Precio, MKT, Tech).
+    [ ] Cálculos de costes (Almacenamiento, Ruptura, No Servicio).
+    [ ] Lógica de ventas pendientes.
+[ ] Realizar pruebas de integración simulando varios meses con decisiones variadas.
+[ ] Validar resultados (si es posible) contra escenarios conocidos o el ejemplo del PDF (con estrategia fija).
+
+## Documentación
+[ ] Revisar y completar docstrings (`"""Docstring"""`) para todas las clases y métodos públicos.
+[ ] Crear/Completar el archivo `README.md` con:
+    [ ] Descripción del proyecto.
+    [ ] Instrucciones de instalación (`requirements.txt`).
+    [ ] Instrucciones de uso (cómo ejecutar, opciones).
+    [ ] (Opcional) Explicación breve de la configuración.
+
+## Calidad de Código
+[ ] Realizar limpieza general del código (eliminar `print` de depuración, código comentado innecesario).
+[ ] Asegurar un estilo de código consistente (ej: PEP 8).
+[ ] Revisar y refactorizar si es necesario para mejorar claridad o eficiencia.
+
+
+# --- Futuro / Opcional ---
+
+[ ] Implementar modo de ejecución no interactivo con estrategias predefinidas por empresa.
+[ ] Crear una Interfaz Gráfica de Usuario (GUI) simple (ej: con Tkinter, PyQt, Kivy).
+[ ] Optimizar el rendimiento para simulaciones con muchos meses.
+[ ] Añadir más factores al modelo (ej: efectos cruzados de marketing, obsolescencia tecnológica).
+[ ] Permitir número variable de empresas.
+

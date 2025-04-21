@@ -1,4 +1,4 @@
-% Se detectan los tÈrminos negativos
+% Se detectan los t√©rminos negativos
 function [V]=Negativo(V,j,a)
 d=size(a);
 Sumaneg= sum(V(a,j)); %Se suman todos los valores positivos
@@ -13,5 +13,5 @@ end
 end
 
 % Como se anulan estos valores negativos,
-% el resto de empresas disminuir· sus ventas de forma proporcional 
+% el resto de empresas disminuir√° sus ventas de forma proporcional 
 % sin llegar a tener ventas negativas.

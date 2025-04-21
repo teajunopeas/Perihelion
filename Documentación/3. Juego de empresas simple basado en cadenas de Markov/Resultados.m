@@ -1,17 +1,17 @@
 % Se Representan los resultados en varios diagramas 
-% obtenidos desde el inicio (mes cero) hasta el mes final (duración)
+% obtenidos desde el inicio (mes cero) hasta el mes final (duraciÃ³n)
 function Resultados(V, CM, duracion,UD, PRESUPUESTO,CV)
 
-%Diagrama de barras de la distribución de ventas posibles
+%Diagrama de barras de la distribuciÃ³n de ventas posibles
 
 x=0:duracion; % "x" representa la variable TIEMPO
 
-figure('position',[5,50, 700,450])% Posición de cada una de las figuras en la pantalla.
+figure('position',[5,50, 700,450])% PosiciÃ³n de cada una de las figuras en la pantalla.
 % De esta forma las vemos todas a la vez
 % Diagrama de Barras
 subplot(2,2,1)
-bar(V(:,duracion+1)) % (2,2,1) se divide en 2 filas, 2 columnas y se coloca en la posición 1.
-% "bar" diagrama de barras del último mes.
+bar(V(:,duracion+1)) % (2,2,1) se divide en 2 filas, 2 columnas y se coloca en la posiciÃ³n 1.
+% "bar" diagrama de barras del ï¿½ltimo mes.
 set(gca,'xticklabel',str2mat('Mercedes','Peugeot','Penhard-L','Mors'))
 title('Ventas posibles por empresa')
 xlabel('Empresas')
@@ -20,7 +20,7 @@ grid on
 
 %Diagrama de barras para las unidades fabricadas
 
-subplot(2,2,2), bar(UD(:,duracion+1)) % aquí está colocado en la posición 2.
+subplot(2,2,2), bar(UD(:,duracion+1)) % aquï¿½ estï¿½ colocado en la posiciÃ³n 2.
 set(gca,'xticklabel',str2mat('Mercedes','Peugeot','Penhard-L','Mors'))
 title('Unidades fabricadas por empresa')
 xlabel('Empresas')
@@ -30,7 +30,7 @@ set(gca,'YGrid','on')
 
 %Diagrama de barras para el presupuesto
 
-subplot(2,2,3:4), bar(PRESUPUESTO(:,duracion+1)) % ocupa tanto la posición 3 como la 4.
+subplot(2,2,3:4), bar(PRESUPUESTO(:,duracion+1)) % ocupa tanto la posiciÃ³n 3 como la 4.
 set(gca,'xticklabel',str2mat('Mercedes','Peugeot','Penhard-L','Mors')) % "str2mat" nombra a cada una de las empresas debajo del lugar correspondiente.
 title('Presupuesto de la empresa')
 xlabel('Empresas')
@@ -69,7 +69,7 @@ title('Probabilidad de cambio de la empresa Mors a:')
 
 
 
-%Diagrama de evolución (dividido en 4 filas y 1 columna)
+%Diagrama de evoluciÃ³n (dividido en 4 filas y 1 columna)
 
 figure('position',[710,0, 530,720])
 subplot(4,1,1), plot(x,PRESUPUESTO)

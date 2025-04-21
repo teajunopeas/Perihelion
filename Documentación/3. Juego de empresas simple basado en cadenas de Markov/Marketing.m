@@ -3,18 +3,18 @@ function [CTOTAL,CM,PUB]=Marketing(i,j,CM,CTOTAL,PRESUPUESTO,Empresa,PUB,duracio
 
 if PRESUPUESTO (i,j)<=0
 
-    fprintf('Si la empresa se encuentra en números rojos, no se permite realizar inversiones  \n')
+    fprintf('Si la empresa se encuentra en nÃºmeros rojos, no se permite realizar inversiones  \n')
 
 else
-    fprintf('¿Desea modificar la inversión en Marketing del mes pasado?')
+    fprintf('Â¿Desea modificar la inversiÃ³n en Marketing del mes pasado?')
     fprintf('\n1) Teclee un 1 si desea modificarla.')
     fprintf('\n2) Teclee un 2 si no desea modificarla.\n')
-    modificacion= Unodos(); %Comprobamos si es 1 ó 2
+    modificacion= Unodos(); %Comprobamos si es 1 Ã³ 2
     if modificacion==1
 
-        fprintf('Introduzca la inversión en Marketing que desea realizar la empresa %s\n',Empresa(i))
-        PUB(i,j)=input(''); %Pedimos la inversión en Marketing
-        while PUB(i,j)<0  || PUB(i,j)> PRESUPUESTO(i,j)%La inversión en Marketing debe ser positiva (no entero) y está limitada por el presupuesto
+        fprintf('Introduzca la inversiÃ³n en Marketing que desea realizar la empresa %s\n',Empresa(i))
+        PUB(i,j)=input(''); %Pedimos la inversiÃ³n en Marketing
+        while PUB(i,j)<0  || PUB(i,j)> PRESUPUESTO(i,j)%La inversiÃ³n en Marketing debe ser positiva (no entero) y estÃ¡ limitada por el presupuesto
             fprintf('Ese valor no es correcto, introduzca otra cantidad\n')
             fprintf('Debe ser positivo y no superior a su presupuesto actual: %.2f \n', PRESUPUESTO(i,j));
             PUB(i,j)=input('');
@@ -22,7 +22,7 @@ else
 
         salida=1; %Variable de salida
         while PUB(i,j)==0 && salida==1
-            fprintf('No se ha invertido nada en Marketing. ¿Es eso correcto?')
+            fprintf('No se ha invertido nada en Marketing. Â¿Es eso correcto?')
             fprintf('\n1) Teclee un 1 si es correcto.')
             fprintf('\n2) Teclee un 2 si desea modificar la cantidad.\n')
             nomodificacion= Unodos(); %Comprobamos si es 1 o 2
@@ -31,7 +31,7 @@ else
 
                 fprintf('Introduzca la cantidad que desea invertir la empresa %s\n',Empresa(i))
                 PUB(i,j)=input('');
-                while PUB(i,j)<0  || PUB(i,j)> PRESUPUESTO(i,j)%La inversion en Marketing debe ser positiva (no entero) y está limitada por el presupuesto
+                while PUB(i,j)<0  || PUB(i,j)> PRESUPUESTO(i,j)%La inversion en Marketing debe ser positiva (no entero) y estÃ¡ limitada por el presupuesto
                     fprintf('Ese valor no es correcto, introduzca otro valor\n')
                     fprintf('Debe ser positivo y no superior a su presupuesto actual: %.2f \n', PRESUPUESTO(i,j));
                     PUB(i,j)=input('');
