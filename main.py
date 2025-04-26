@@ -15,7 +15,7 @@ INITIAL_PVP = 10000
 INITIAL_FIXED_COST = 50000
 INITIAL_VARIABLE_COST = 8000
 INITIAL_STOCK = 100
-INITIAL_DEMAND = 1000
+INITIAL_DEMAND = 10000
 STORAGE_COST_PER_UNIT = 100
 STOCKOUT_COST_PER_UNIT = 2000
 NO_SERVICE_COST_PER_UNIT = 1000
@@ -28,7 +28,7 @@ def main():
     # Por ahora, usamos valores genéricos.
     
     # Limpiar la consola
-    clear_console() # type: ignore como se importa desde __init__.py, no es necesario importar helpers.clear_console() de nuevo
+    # clear_console() # type: ignore como se importa desde __init__.py, no es necesario importar helpers.clear_console() de nuevo
     print("Iniciando la simulación de empresas...")
 
     # Crear las empresas
@@ -45,14 +45,17 @@ def main():
             'coste_ruptura_unitario': STOCKOUT_COST_PER_UNIT,
             'coste_no_servicio_unitario': NO_SERVICE_COST_PER_UNIT,
         }
-        company = Company(config, RUPTADM_GLOBAL)
+        company = Company(config, RUPTADM_GLOBAL) # type: ignore
         companies.append(company)
 
     # Matriz de Markov inicial (todos los valores iguales a 0.25)
     initial_markov = np.full((NUM_EMPRESAS, NUM_EMPRESAS), 1 / NUM_EMPRESAS)
 
     # Inicializar la simulación
-    sim = Simulation(companies, initial_markov, RUPTADM_GLOBAL, INITIAL_DEMAND)
+    sim = Simulation(companies, initial_markov, RUPTADM_GLOBAL, INITIAL_DEMAND) # type: ignore
+
+
+    sim.run_simulation()  # Ejecutar la simulación completa (se omite en este caso porque no esta implementada la demanda total)
 
     # Ejecutar la simulación por cada mes
     for month in range(MESES_SIMULACION):
@@ -63,12 +66,15 @@ def main():
         # for company in companies:
         #     company.decidir_estrategias(nuevo_pvp=..., inv_mkt=..., inv_tech=...)
         
+        
+
         # Ejecutar un paso de la simulación
-        sim.run_step()  # Pasar la demanda total del mes (Se omite en este caso porque no esta implementada la demanda total)
+        # sim.run_step()  # Pasar la demanda total del mes (Se omite en este caso porque no esta implementada la demanda total)
         
         # Imprimir resultados del mes (opcional)
         for company in companies:
             print(f"{company.nombre}: Ventas = {company.ventas_reales_mes}, Presupuesto = {company.presupuesto}")
+            
 
     # Imprimir resultados finales (opcional)
     print("\n--- Resultados finales ---")

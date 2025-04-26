@@ -223,8 +223,10 @@ class Simulation:
         TODO: Implementar fluctuación basada en PDF (ej: +/- 10% aleatorio).
         """
         # Ejemplo de fluctuación simple (descomentar para probar):
-        # fluctuacion = random.uniform(-0.10, 0.10) # +/- 10%
-        # self.market_demand = max(0, int(round(self.market_demand * (1 + fluctuacion))))
+        fluctuacion = random.uniform(-0.10, 0.10) # +/- 10%
+        self.market_demand = max(0, int(round(self.market_demand * (1 + fluctuacion))))
+
+        
         # print(f"Debug: Nueva demanda mercado para mes {self.current_month + 1}: {self.market_demand}")
         pass
 
