@@ -1,0 +1,29 @@
+Tal como está definido el archivo __init.py__ si se usa from utils import * desde otro archivo, deberia
+de funcionar correctamente, pero si por ejemplo en file_manager.py usamos from utils import * no funciona correctamente
+y en ese caso, tendriamos que importar uno a uno los archivos de el paquete, por ejemplo
+
+------------------------------------------------------------------------------------------------------------------------
+NO VALIDO
+# utils/file_manager
+
+from utils import *
+
+input = Unodos() # ERROR, no reconoce la función
+------------------------------------------------------------------------------------------------------------------------
+CORRECIÓN
+# utils/file_manager
+from utils import Unodos
+
+....Codigo del script....
+
+input = Unodos()
+
+También podriamos importar en este caso, todo el archivo helpers en si.
+------------------------------------------------------------------------------------------------------------------------
+ALTERNATIVA
+# utils/file_manager
+from utils import helpers
+
+....Codigo del script....
+
+input = helpers.Unodos()
