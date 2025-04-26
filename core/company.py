@@ -3,6 +3,7 @@
 
 import numpy as np
 from typing import Dict, Any, Optional # Para type hints
+# import utils
 
 class Company:
     """

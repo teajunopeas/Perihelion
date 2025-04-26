@@ -1,6 +1,7 @@
 # Importaciones
 from utils import *
 from core import *
+from utils import *
 import numpy as np
 
 # Constantes y configuración inicial
@@ -14,6 +15,7 @@ INITIAL_PVP = 10000
 INITIAL_FIXED_COST = 50000
 INITIAL_VARIABLE_COST = 8000
 INITIAL_STOCK = 100
+INITIAL_DEMAND = 1000
 STORAGE_COST_PER_UNIT = 100
 STOCKOUT_COST_PER_UNIT = 2000
 NO_SERVICE_COST_PER_UNIT = 1000
@@ -24,17 +26,21 @@ RUPTADM_GLOBAL = 1  # 1: Clientes esperan; 2: Clientes no esperan
 def main():
     # TODO: Si tienes datos históricos específicos (como en el PDF), carga o define los valores iniciales aquí.
     # Por ahora, usamos valores genéricos.
+    
+    # Limpiar la consola
+    clear_console() # type: ignore como se importa desde __init__.py, no es necesario importar helpers.clear_console() de nuevo
+    print("Iniciando la simulación de empresas...")
 
     # Crear las empresas
     companies = []
     for i in range(NUM_EMPRESAS):
         config = {
             'nombre': f'Empresa {i+1}',
-            'presupuesto': INITIAL_BUDGET,
-            'pvp': INITIAL_PVP,
-            'coste_fijo': INITIAL_FIXED_COST,
-            'coste_variable': INITIAL_VARIABLE_COST,
-            'stock': INITIAL_STOCK,
+            'presupuesto_inicial': INITIAL_BUDGET,
+            'pvp_inicial': INITIAL_PVP,
+            'coste_fijo_mensual': INITIAL_FIXED_COST,
+            'coste_variable_unitario': INITIAL_VARIABLE_COST,
+            'stock_inicial': INITIAL_STOCK,
             'coste_almacenamiento_unitario': STORAGE_COST_PER_UNIT,
             'coste_ruptura_unitario': STOCKOUT_COST_PER_UNIT,
             'coste_no_servicio_unitario': NO_SERVICE_COST_PER_UNIT,
@@ -46,7 +52,7 @@ def main():
     initial_markov = np.full((NUM_EMPRESAS, NUM_EMPRESAS), 1 / NUM_EMPRESAS)
 
     # Inicializar la simulación
-    sim = Simulation(companies, initial_markov, RUPTADM_GLOBAL)
+    sim = Simulation(companies, initial_markov, RUPTADM_GLOBAL, INITIAL_DEMAND)
 
     # Ejecutar la simulación por cada mes
     for month in range(MESES_SIMULACION):
@@ -58,7 +64,7 @@ def main():
         #     company.decidir_estrategias(nuevo_pvp=..., inv_mkt=..., inv_tech=...)
         
         # Ejecutar un paso de la simulación
-        sim.run_step(DEMANDA_TOTAL_MES)  # Pasar la demanda total del mes
+        sim.run_step()  # Pasar la demanda total del mes (Se omite en este caso porque no esta implementada la demanda total)
         
         # Imprimir resultados del mes (opcional)
         for company in companies:

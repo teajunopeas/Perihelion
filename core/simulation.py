@@ -4,6 +4,7 @@
 import numpy as np
 import random
 from typing import List, Dict, Any, Optional
+from utils import file_manager, math_utils, helpers
 
 # Importar la clase Company (asumiendo que está en el mismo directorio 'core')
 try:
@@ -24,7 +25,7 @@ class Simulation:
     la matriz de transición de Markov, y ejecuta la simulación mes a mes.
     """
 
-    def __init__(self, lista_configs_empresas: List[Dict[str, Any]],
+    def __init__(self, empresas: List[Company],
                  markov_inicial: np.ndarray,
                  demanda_inicial: int,
                  ruptadm_global: int):
@@ -40,17 +41,20 @@ class Simulation:
             ruptadm_global: Configuración global (1 o 2) que indica si los
                              clientes esperan en caso de ruptura de stock.
         """
-        self.num_empresas: int = len(lista_configs_empresas)
+        self.num_empresas: int = len(empresas)
         if self.num_empresas <= 0:
             raise ValueError("La simulación debe tener al menos una empresa.")
 
-        # Crear las instancias de Company
-        try:
-            self.empresas: List[Company] = [
-                Company(config, ruptadm_global) for config in lista_configs_empresas
-            ]
-        except ValueError as e:
-             raise ValueError(f"Error al inicializar las empresas: {e}") from e
+        # Validar número de empresas e inicializar
+        self.num_empresas: int = len(empresas)
+        if self.num_empresas <= 0:
+            raise ValueError("La simulación debe tener al menos una empresa.")
+        else:
+            self.empresas: List[Company] = empresas
+        
+        # Validar que todos los elementos sean instancias de Company
+        if not all(isinstance(empresa, Company) for empresa in empresas):
+            raise TypeError("Todos los elementos de la lista deben ser instancias de la clase Company.")
 
         # Validar y almacenar matriz de Markov
         if markov_inicial.shape != (self.num_empresas, self.num_empresas):
@@ -130,6 +134,26 @@ class Simulation:
         # print("Debug: _update_markov_matrix - Lógica pendiente.")
         # TODO: Implementar la lógica de actualización basada en decisiones y fórmulas PDF.
         # Ejemplo placeholder: No hacer nada, la matriz se queda como está.
+        
+        # Inicializar una nueva matriz de Markov (copia de la actual)
+        new_markov_matrix = self.markov_matrix.copy()
+
+        # Aquí iría la lógica de actualización de la matriz basada en decisiones de las empresas
+        for i, empresa in enumerate(self.empresas):
+            # Obtener decisiones de la empresa (PVP, MKT, TECH)
+            pvp = empresa.pvp
+            inv_mkt = empresa.marketing_investment
+            inv_tech = empresa.tech_investment
+
+            # Calcular efectos en la matriz de Markov (placeholder)
+            # Aquí deberías aplicar las fórmulas del PDF para cada empresa
+            # Por ejemplo:
+            # new_markov_matrix[i, :] = calcular_efecto_precio_m(pvp, inv_mkt, inv_tech)
+
+            # Placeholder: No hacer nada por ahora
+
+
+
         pass
         # Al final, siempre validar/normalizar
         self._validar_y_normalizar_matriz_markov()
