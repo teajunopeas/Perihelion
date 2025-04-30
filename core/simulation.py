@@ -4,7 +4,8 @@
 import numpy as np
 import random
 from typing import List, Dict, Any, Optional
-from utils import file_manager, math_utils, helpers
+from utils import *
+# from utils.file_manager import save_to_file, load_from_file # Se importan en el __init__.py de utils
 
 # Importar la clase Company (asumiendo que está en el mismo directorio 'core')
 try:
@@ -74,6 +75,7 @@ class Simulation:
         self.historial_stock: List[List[int]] = [[] for _ in range(self.num_empresas)]
         self.historial_ventas: List[List[int]] = [[] for _ in range(self.num_empresas)]
         self.historial_cuota_mercado: List[List[float]] = [[] for _ in range(self.num_empresas)]
+        self.historial_markov: List[np.ndarray] = []
         # Guardar estado inicial en historial
         self._guardar_estado_historial()
 
@@ -277,6 +279,10 @@ class Simulation:
                 self.historial_stock[i].append(empresa.stock)
                 self.historial_ventas[i].append(empresa.ventas_reales_mes) # Ventas del mes que acaba de terminar
                 self.historial_cuota_mercado[i].append(cuotas[i])
+            # Guardar copia de la matriz de Markov en el historial
+            if not hasattr(self, 'historial_markov'):
+                self.historial_markov = []
+            self.historial_markov.append(self.markov_matrix.copy())
         except Exception as e:
             print(f"Error al guardar historial en mes {self.current_month}: {e}")
 
@@ -386,15 +392,69 @@ class Simulation:
             print("-" * 20)
         # TODO: Añadir más análisis si se desea (beneficio total, etc.)
 
-    # --- Métodos para Guardar/Cargar (Placeholders) ---
-    # TODO: Implementar usando file_manager.py o similar
+
     def save_state(self, filepath: str) -> None:
         """Guarda el estado actual completo de la simulación."""
-        print(f"TODO: Implementar guardado de estado en {filepath}")
-        # Necesitaría serializar self.empresas, self.markov_matrix, self.market_demand, etc.
+        try:
+            state = {
+                'empresas': [empresa.__dict__ for empresa in self.empresas],
+                'markov_matrix': self.markov_matrix.tolist(),
+                'market_demand': self.market_demand,
+                'current_month': self.current_month,
+                'ruptadm': self.ruptadm,
+                'historial_presupuesto': self.historial_presupuesto,
+                'historial_stock': self.historial_stock,
+                'historial_ventas': self.historial_ventas,
+                'historial_cuota_mercado': self.historial_cuota_mercado,
+                'historial_markov': [matrix.tolist() for matrix in self.historial_markov]
+            }
+            save_to_file(filepath, state) # type: ignore
+            print(f"Estado guardado exitosamente en {filepath}")
+        except Exception as e:
+            print(f"Error al guardar el estado: {e}")
 
-    def load_state(self, filepath: str) -> None:
-        """Carga el estado de la simulación desde un archivo."""
-        print(f"TODO: Implementar carga de estado desde {filepath}")
-        # Necesitaría deserializar y restaurar todos los atributos.
-
+    @classmethod
+    def load_state(cls, filepath: str):
+        """Carga el estado de la simulación desde un archivo y devuelve una nueva instancia."""
+        try:
+            state = load_from_file(filepath) # type: ignore
+            empresas = []
+            ruptadm = state.get('ruptadm', 1)
+            for empresa_dict in state['empresas']:
+                # Reconstruir el config esperado por Company
+                config = {
+                    'nombre': empresa_dict.get('nombre'),
+                    'presupuesto_inicial': empresa_dict.get('presupuesto'),
+                    'pvp_inicial': empresa_dict.get('pvp'),
+                    'coste_fijo_mensual': empresa_dict.get('coste_fijo'),
+                    'coste_variable_unitario': empresa_dict.get('coste_variable'),
+                    'stock_inicial': empresa_dict.get('stock'),
+                    'coste_almacenamiento_unitario': empresa_dict.get('coste_almacenamiento_unitario'),
+                    'coste_ruptura_unitario': empresa_dict.get('coste_ruptura_unitario'),
+                    'coste_no_servicio_unitario': empresa_dict.get('coste_no_servicio_unitario'),
+                }
+                empresa = Company(config, ruptadm)
+                # Restaurar atributos adicionales si es necesario
+                for k, v in empresa_dict.items():
+                    if not hasattr(empresa, k) or k in config:
+                        continue
+                    setattr(empresa, k, v)
+                empresas.append(empresa)
+            sim = cls(empresas, np.array(state['markov_matrix']), state['market_demand'], ruptadm)
+            sim.current_month = state['current_month']
+            sim.historial_presupuesto = state.get('historial_presupuesto', [[] for _ in empresas])
+            sim.historial_stock = state.get('historial_stock', [[] for _ in empresas])
+            sim.historial_ventas = state.get('historial_ventas', [[] for _ in empresas])
+            sim.historial_cuota_mercado = state.get('historial_cuota_mercado', [[] for _ in empresas])
+            sim.historial_markov = [np.array(matrix) for matrix in state.get('historial_markov', [])]
+            print(f"Estado cargado exitosamente desde {filepath}")
+            return sim
+        except Exception as e:
+            print(f"Error al cargar el estado: {e}")
+            return None
+        
+    # TODO: Quizás sea útil implementar __str__ o __repr__ para imprimir directamente el estado de la simulación usando matplotlib o pandas.
+    # def __str__(self):
+    #     """Devuelve una representación en cadena del estado actual de la simulación."""
+    #     return f"Simulación en mes {self.current_month} con {self.num_empresas} empresas."
+    #     """"Integrar reporting aquí o usar Reporting como un método separado."""

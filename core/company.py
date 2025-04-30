@@ -233,3 +233,20 @@ class Company:
         self.presupuesto += beneficio_neto_mes
         # print(f"Debug [{self.nombre}]: Ing={self.ingresos_mes:.2f}, CostT={self.coste_total_mes:.2f}, Benef={beneficio_neto_mes:.2f}, PresupFin={self.presupuesto:.2f}")
 
+    def __print__(self) -> str:
+        """
+        Devuelve una representación legible del estado actual de la empresa,
+        orientada a la simulación (información más resumida y amigable).
+        """
+        return (f"Empresa: {self.nombre} | Presupuesto: {self.presupuesto:.2f} € | "
+                f"Stock: {self.stock} uds | PVP: {self.pvp:.2f} €")
+
+    def __repr__(self) -> str:
+        """
+        Devuelve una representación detallada del estado actual de la empresa,
+        orientada a depuración (información más técnica y completa).
+        """
+        return (f"Company(nombre={self.nombre}, presupuesto={self.presupuesto:.2f}, "
+                f"pvp={self.pvp:.2f}, coste_fijo={self.coste_fijo:.2f}, "
+                f"coste_variable={self.coste_variable:.2f}, stock={self.stock}, "
+                f"ruptadm={self.ruptadm})")

@@ -55,7 +55,7 @@ def main():
     sim = Simulation(companies, initial_markov, RUPTADM_GLOBAL, INITIAL_DEMAND) # type: ignore
 
 
-    sim.run_simulation()  # Ejecutar la simulación completa (se omite en este caso porque no esta implementada la demanda total)
+    sim.run_simulation(MESES_SIMULACION)  # Ejecutar la simulación completa (se omite en este caso porque no esta implementada la demanda total)
 
     # Ejecutar la simulación por cada mes
     for month in range(MESES_SIMULACION):
