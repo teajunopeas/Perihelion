@@ -1,7 +1,6 @@
 import json
 import os
 import numpy as np
-from core.company import Company
 from utils import helpers
 
 DEFAULT_FILENAME = "partida.json"
@@ -15,7 +14,7 @@ def validate_filename(filename: str) -> str:
         filename += ".json"
     return filename
 
-def save_game(simulation, filename: str = DEFAULT_FILENAME) -> bool:
+def save_game(simulation, filename: str = DEFAULT_FILENAME) -> None:
     """
     Guarda el estado de la simulación en un archivo JSON.
 
@@ -23,47 +22,28 @@ def save_game(simulation, filename: str = DEFAULT_FILENAME) -> bool:
         simulation: Instancia de la clase Simulation.
         filename: Nombre del archivo donde se guardará la partida (default: partida.json).
 
-    Returns:
-        bool: True si se guardó correctamente, False si hubo un error.
+    Raises:
+        Exception: Si ocurre un error al guardar el archivo.
     """
     try:
         filename = validate_filename(filename)
-        # Preparar datos de las empresas
-        companies_data = [
-            {
-                "nombre": company.nombre,
-                "presupuesto": company.presupuesto,
-                "pvp": company.pvp,
-                "coste_fijo": company.coste_fijo,
-                "coste_variable": company.coste_variable,
-                "stock": company.stock,
-                "coste_almacenamiento_unitario": company.coste_almacenamiento_unitario,
-                "coste_ruptura_unitario": company.coste_ruptura_unitario,
-                "coste_no_servicio_unitario": company.coste_no_servicio_unitario,
-                "ventas_reales_mes": company.ventas_reales_mes,
-                # TODO: Agregar otros atributos de Company si son necesarios (e.g., inversiones históricas)
-            }
-            for company in simulation.companies
-        ]
-        
-        # Preparar datos de la simulación
-        sim_data = {
-            "month": simulation.current_month,
-            "markov_matrix": simulation.markov_matrix.tolist(),  # Convertir NumPy a lista
-            "ruptadm_global": simulation.ruptadm_global,
-            "companies": companies_data,
-            # TODO: Incluir demanda total o datos históricos si se gestionan en Simulation
-        }
-        
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+
+        # Crear el directorio data si no existe
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+
+        filepath = os.path.join(data_dir, filename)
+
+        # Obtener el estado de la simulación como diccionario
+        sim_data = simulation.to_dict()
+
         # Guardar en archivo
-        with open(filename, "w", encoding="utf-8") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             json.dump(sim_data, f, indent=4)
-        print(f"Partida guardada exitosamente en {filename}")
-        return True
-    
+        print(f"Partida guardada exitosamente en {filepath}")
     except Exception as e:
-        print(f"Error al guardar la partida: {str(e)}")
-        return False
+        raise Exception(f"Error al guardar la partida: {str(e)}")
 
 def load_game(filename: str = DEFAULT_FILENAME) -> dict:
     """
@@ -116,6 +96,26 @@ def load_game(filename: str = DEFAULT_FILENAME) -> dict:
         print(f"Error al cargar la partida: {str(e)}")
         return None
 
+def list_saved_games() -> list[str]:
+    """
+    Lista todas las partidas guardadas en el directorio data.
+    
+    Returns:
+        list[str]: Lista de nombres de archivos de partidas guardadas
+    """
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+    
+    # Crear el directorio data si no existe
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+        return []
+    
+    # Filtrar solo archivos .json
+    saved_games = [f for f in os.listdir(data_dir) if f.endswith('.json')]
+    
+    return saved_games
+
+
 def prompt_filename() -> str:
     """
     Solicita al usuario el nombre del archivo, con opción de usar el nombre por defecto.
@@ -123,11 +123,11 @@ def prompt_filename() -> str:
     Returns:
         str: Nombre del archivo elegido.
     """
-    print("¿Qué nombre desea darle al fichero?")
+    chooose_btwn = ["Elegir el nombre por defecto (partida.json)", "Introducir otro nombre"]
     print("1) Escriba 1 para elegir el nombre por defecto (partida.json).")
     print("2) Escriba 2 para poner otro nombre.")
     
-    choice = helpers.Unodos()
+    choice = helpers.Unodos("¿Qué nombre desea darle al fichero?",)
     
     if choice == "1":
         return DEFAULT_FILENAME

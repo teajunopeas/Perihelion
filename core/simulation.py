@@ -408,10 +408,10 @@ class Simulation:
                 'historial_cuota_mercado': self.historial_cuota_mercado,
                 'historial_markov': [matrix.tolist() for matrix in self.historial_markov]
             }
-            save_to_file(filepath, state) # type: ignore
+            save_to_file(filepath, state)  # type: ignore
             print(f"Estado guardado exitosamente en {filepath}")
         except Exception as e:
-            print(f"Error al guardar el estado: {e}")
+            raise RuntimeError(f"Error al guardar el estado: {e}")
 
     @classmethod
     def load_state(cls, filepath: str):
@@ -452,6 +452,29 @@ class Simulation:
         except Exception as e:
             print(f"Error al cargar el estado: {e}")
             return None
+
+    def to_dict(self) -> dict:
+        """Convierte el estado actual de la simulación en un diccionario."""
+        return {
+            'month': self.current_month,
+            'markov_matrix': self.markov_matrix.tolist(),
+            'ruptadm_global': self.ruptadm,
+            'companies': [
+                {
+                    'nombre': company.nombre,
+                    'presupuesto': company.presupuesto,
+                    'pvp': company.pvp,
+                    'coste_fijo': company.coste_fijo,
+                    'coste_variable': company.coste_variable,
+                    'stock': company.stock,
+                    'coste_almacenamiento_unitario': company.coste_almacenamiento_unitario,
+                    'coste_ruptura_unitario': company.coste_ruptura_unitario,
+                    'coste_no_servicio_unitario': company.coste_no_servicio_unitario,
+                    'ventas_reales_mes': company.ventas_reales_mes,
+                }
+                for company in self.empresas
+            ]
+        }
         
     # TODO: Quizás sea útil implementar __str__ o __repr__ para imprimir directamente el estado de la simulación usando matplotlib o pandas.
     # def __str__(self):
