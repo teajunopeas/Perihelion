@@ -34,7 +34,7 @@ def diagrama_pastel(ax, data, title, labels_prefix):
 
     # Filtrar datos muy pequeños para evitar errores/warnings en pie y leyenda
     threshold = 1e-6 # Umbral pequeño
-    valid_indices = [i for i, d in enumerate(data) if d >= threshold]
+    valid_indices = (i for i, d in enumerate(data) if d >= threshold)
 
     if not valid_indices: # Si todos los datos son cero o muy pequeños
         print(f"Advertencia: No hay datos válidos (>= {threshold}) para graficar en '{title}'.")
@@ -43,8 +43,8 @@ def diagrama_pastel(ax, data, title, labels_prefix):
         return
 
     # Extraer solo los datos y etiquetas válidos
-    valid_data = [data[i] for i in valid_indices]
-    valid_labels = [labels[i] for i in valid_indices]
+    valid_data = (data[i] for i in valid_indices)
+    valid_labels = (labels[i] for i in valid_indices)
 
     # --- CORRECCIÓN AQUÍ ---
     # Llamar a ax.pie solo esperando 'wedges' ya que labels y autopct son None
