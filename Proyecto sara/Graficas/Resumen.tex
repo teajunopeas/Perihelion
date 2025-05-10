@@ -1,0 +1,42 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{eurosym}
+
+\sisetup{
+	output-decimal-marker = {.},
+	group-separator = {,},
+	group-minimum-digits = 4,
+	detect-all,
+	detect-weight = true,
+	detect-family = true
+}
+
+\begin{document}
+	\leavevmode % Previene errores de caja vacía con standalone
+	
+	\begin{minipage}{1.02\linewidth}
+		\centering
+		
+		\textbf{Resumen de estrategias – Mes 0}\\[0.5em]
+		\begin{tabular}{@{}l
+				S[table-format=5.0]
+				S[table-format=5.0]
+				S[table-format=5.0]
+				S[table-format=5.0]@{}}
+			\toprule
+			\textbf{Acción} & \textbf{Mercedes} & \textbf{Peugeot} & \textbf{Penhard-L.} & \textbf{Mors} \\
+			\midrule
+			Inversión en Marketing              & 38000  & 36000  & 34600  & 11000 \\
+			Inversión en Tecnología             & 28000  & 24000  & 14800  & 32000 \\
+			Precio de Venta (PVP) [\euro]       & 28000.00 & 27000.00 & 24500.00 & 26500.00 \\
+			Unidades a la Venta                 & 29     & 30     & 29     & 29 \\
+			\bottomrule
+		\end{tabular}
+	\end{minipage}
+	
+\end{document}

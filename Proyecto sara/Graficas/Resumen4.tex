@@ -1,0 +1,42 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{eurosym}
+
+\sisetup{
+	output-decimal-marker = {.},
+	group-separator = {,},
+	group-minimum-digits = 4,
+	detect-all,
+	detect-weight = true,
+	detect-family = true
+}
+
+\begin{document}
+	\leavevmode
+	
+	\begin{minipage}{1.02\linewidth}
+		\centering
+		
+		\textbf{Resumen de estrategias – Mes 4}\\[0.5em]
+		\begin{tabular}{@{}l
+				S[table-format=5.0]
+				S[table-format=5.0]
+				S[table-format=5.0]
+				S[table-format=5.0]@{}}
+			\toprule
+			\textbf{Acción} & \textbf{Mercedes} & \textbf{Peugeot} & \textbf{Penhard-L.} & \textbf{Mors} \\
+			\midrule
+			Inversión en Marketing              & 36000  & 25000  & 24600  & 27000 \\
+			Inversión en Tecnología             & 30000  & 27000  & 24500  & 35900 \\
+			Precio de Venta (PVP) [\euro]       & 31000.00 & 27200.00 & 25400.00 & 26000.00 \\
+			Unidades a la Venta                 & 42     & 40     & 40     & 37 \\
+			\bottomrule
+		\end{tabular}
+	\end{minipage}
+	
+\end{document}

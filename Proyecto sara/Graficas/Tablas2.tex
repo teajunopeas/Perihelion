@@ -1,0 +1,68 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{eurosym}
+
+\sisetup{
+	output-decimal-marker = {.},
+	group-separator = {,},
+	group-minimum-digits = 4,
+	detect-all,
+	detect-weight = true,
+	detect-family = true
+}
+
+\begin{document}
+	\leavevmode
+	
+	\begin{minipage}{1.08\linewidth}
+		\centering
+		
+		% Tabla 1
+		\textbf{Tabla 3: Datos de Producción – Mes 2}\\[0.5em]
+		\begin{tabular}{@{}l
+				S[table-format=2.0]
+				S[table-format=2.0]
+				S[table-format=2.0]
+				S[table-format=2.0]@{}}
+			\toprule
+			\textbf{Empresa} & \textbf{Mercedes} & \textbf{Peugeot} & \textbf{Penhard-L.} & \textbf{Mors} \\
+			\midrule
+			Unidades fabricadas         & 30        & 27        & 30        & 31        \\
+			Demanda estimada (V)        & 35        & 33        & 34        & 32        \\
+			Ventas reales               & 33        & 31        & 32        & 32        \\
+			Clientes en espera          & 2         & 2         & 2         & 0         \\
+			Precio venta (PVP) [\euro]  & 29500.00  & 27500.00  & 25200.00  & 26000.00  \\
+			Coste Fijo (CF) [\euro]     & 580000.00 & 400000.00 & 310000.00 & 230000.00 \\
+			Coste Variable (CV) [\euro] & 16746.55  & 14708.30  & 13069.20  & 12708.40  \\
+			Stock final                 & 0         & 0         & 0         & 1         \\
+			Coste Stock Total [\euro]   & 0.00      & 0.00      & 0.00      & 600.00    \\
+			Coste No Serv Total [\euro] & 4000.00   & 3600.00   & 3400.00   & 0.00      \\
+			Coste Ruptura Total [\euro] & 0.00      & 0.00      & 0.00      & 0.00      \\
+			\bottomrule
+		\end{tabular}
+		
+		\vspace{2em}
+		
+		% Tabla 2
+		\textbf{Tabla 4: Resumen de Cuentas – Mes 2}\\[0.5em]
+		\begin{tabular}{@{}l
+				S[table-format=7.2]
+				S[table-format=7.2]
+				S[table-format=7.2]
+				S[table-format=7.2]@{}}
+			\toprule
+			\textbf{Concepto} & \textbf{Mercedes} & \textbf{Peugeot} & \textbf{Penhard-L.} & \textbf{Mors} \\
+			\midrule
+			Ingresos [\euro]              & 973500.00  & 852500.00  & 806400.00  & 832000.00  \\
+			Costes Totales [\euro]        & 1148396.39 & 851724.06  & 745275.95  & 678860.35  \\
+			Presupuesto Final [\euro]     & 4394915.39 & 4203123.46 & 2954274.80 & 3083295.95 \\
+			\bottomrule
+		\end{tabular}
+		
+	\end{minipage}
+\end{document}

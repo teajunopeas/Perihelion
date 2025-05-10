@@ -1,0 +1,69 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{eurosym}
+
+\sisetup{
+	output-decimal-marker = {.},
+	group-separator = {,},
+	group-minimum-digits = 4,
+	detect-all,
+	detect-weight = true,
+	detect-family = true
+}
+
+\begin{document}
+	\leavevmode % Previene errores de caja vacía con standalone
+	
+	\begin{minipage}{1.08\linewidth}
+		\centering
+		
+		% Tabla 1
+		\textbf{Tabla 1: Datos de Producción – Mes 0}\\[0.5em]
+		\begin{tabular}{@{}l
+				S[table-format=2.0]
+				S[table-format=2.0]
+				S[table-format=2.0]
+				S[table-format=2.0]@{}}
+			\toprule
+			\textbf{Empresa} & \textbf{Mercedes} & \textbf{Peugeot} & \textbf{Penhard-L.} & \textbf{Mors} \\
+			\midrule
+			Unidades fabricadas             & 34        & 35        & 36        & 33        \\
+			Demanda estimada (V)            & 29        & 30        & 29        & 29        \\
+			Ventas reales                   & 29        & 30        & 29        & 29        \\
+			Clientes en espera              & 0         & 0         & 0         & 0         \\
+			Precio venta (PVP) [\euro]      & 28000.00  & 27000.00  & 24500.00  & 26500.00  \\
+			Coste Fijo (CF) [\euro]         & 580000.00 & 400000.00 & 310000.00 & 230000.00 \\
+			Coste Variable (CV) [\euro]     & 18519.71  & 16240.22  & 14361.74  & 13356.45  \\
+			Stock final                     & 5         & 5         & 7         & 4         \\
+			Coste Stock Total [\euro]       & 5000.00   & 4000.00   & 6300.00   & 2400.00   \\
+			Coste No Serv Total [\euro]     & 0.00      & 0.00      & 0.00      & 0.00      \\
+			Coste Ruptura Total [\euro]     & 0.00      & 0.00      & 0.00      & 0.00      \\
+			\bottomrule
+		\end{tabular}
+		
+		\vspace{2em} % Separación vertical clara
+		
+		% Tabla 2
+		\textbf{Tabla 2: Resumen de Cuentas – Mes 0}\\[0.5em]
+		\begin{tabular}{@{}l
+				S[table-format=7.2]
+				S[table-format=7.2]
+				S[table-format=7.2]
+				S[table-format=7.2]@{}}
+			\toprule
+			\textbf{Concepto} & \textbf{Mercedes} & \textbf{Peugeot} & \textbf{Penhard-L.} & \textbf{Mors} \\
+			\midrule
+			Ingresos [\euro]              & 812000.00  & 810000.00  & 710500.00  & 768500.00  \\
+			Costes Totales [\euro]        & 1280670.08 & 1032407.77 & 882722.59  & 716162.99  \\
+			Presupuesto Final [\euro]     & 4831329.92 & 4277592.23 & 2827777.41 & 2752337.01 \\
+			\bottomrule
+		\end{tabular}
+		
+	\end{minipage}
+	
+\end{document}
