@@ -5,8 +5,6 @@ import os # Para limpiar la consola (equivalente a clc)
 import math
 import random
 
-# Requirements: numpy, matplotlib, tk (para la interfaz gráfica)
-
 # --- Funciones Auxiliares (Traducción de funciones MATLAB) ---
 
 # Equivalente a clc (limpia la pantalla)
@@ -34,7 +32,7 @@ def diagrama_pastel(ax, data, title, labels_prefix):
 
     # Filtrar datos muy pequeños para evitar errores/warnings en pie y leyenda
     threshold = 1e-6 # Umbral pequeño
-    valid_indices = (i for i, d in enumerate(data) if d >= threshold)
+    valid_indices = [i for i, d in enumerate(data) if d >= threshold]
 
     if not valid_indices: # Si todos los datos son cero o muy pequeños
         print(f"Advertencia: No hay datos válidos (>= {threshold}) para graficar en '{title}'.")
@@ -43,8 +41,8 @@ def diagrama_pastel(ax, data, title, labels_prefix):
         return
 
     # Extraer solo los datos y etiquetas válidos
-    valid_data = (data[i] for i in valid_indices)
-    valid_labels = (labels[i] for i in valid_indices)
+    valid_data = [data[i] for i in valid_indices]
+    valid_labels = [labels[i] for i in valid_indices]
 
     # --- CORRECCIÓN AQUÍ ---
     # Llamar a ax.pie solo esperando 'wedges' ya que labels y autopct son None
@@ -791,7 +789,142 @@ if cargar == 1:
         print("\nDatos cargados. Estado inicial (Mes 0):")
         # Mostrar tabla resumen del estado cargado (similar al código MATLAB)
         print('\n--- Datos Almacenados (Estado Inicial Mes 0) ---')
-        print('__________________________________** no servicio si no espera
+        print('________________________________________________________________________________________')
+        print('|                       |                            Empresa                             |')
+        print('|         Datos         |________________________________________________________________|')
+        print('|                       |    Mercedes    |    Peugeot   |Penhard-Levassor|      Mors     |')
+        print('|_______________________|________________|______________|________________|_______________|')
+        print(f'|  Unidades fabricadas  | {UD[0,0]:>14d} | {UD[1,0]:>12d} | {UD[2,0]:>14d} | {UD[3,0]:>13d} |')
+        print(f'| Demanda de la empresa | {V[0,0]:>14d} | {V[1,0]:>12d} | {V[2,0]:>14d} | {V[3,0]:>13d} |')
+        print(f'| Ventas de la empresa  | {Ventasreales[0,0]:>14d} | {Ventasreales[1,0]:>12d} | {Ventasreales[2,0]:>14d} | {Ventasreales[3,0]:>13d} |')
+        print(f'|  Clientes en espera   | {VENTASPENDIENTES[0,0]:>14d} | {VENTASPENDIENTES[1,0]:>12d} | {VENTASPENDIENTES[2,0]:>14d} | {VENTASPENDIENTES[3,0]:>13d} |')
+        print(f'|    Precio de venta    | {PVP[0,0]:>14.2f} | {PVP[1,0]:>12.2f} | {PVP[2,0]:>14.2f} | {PVP[3,0]:>13.2f} |')
+        print(f'|     Costes fijos      | {CF[0,0]:>14.0f} | {CF[1,0]:>12.0f} | {CF[2,0]:>14.0f} | {CF[3,0]:>13.0f} |') # Asumiendo CF es entero
+        print(f'|   Costes variables    | {CV[0,0]:>14.2f} | {CV[1,0]:>12.2f} | {CV[2,0]:>14.2f} | {CV[3,0]:>13.2f} |')
+        print(f'|   Unidades en stock   | {STOCK[0,0]:>14d} | {STOCK[1,0]:>12d} | {STOCK[2,0]:>14d} | {STOCK[3,0]:>13d} |')
+        print(f'|    Costes de stock    | {CALM_TOTAL[0,0]:>14.0f} | {CALM_TOTAL[1,0]:>12.0f} | {CALM_TOTAL[2,0]:>14.0f} | {CALM_TOTAL[3,0]:>13.0f} |') # Coste total
+        print(f'| Costes de no servicio | {CNOSERV_TOTAL[0,0]:>14.0f} | {CNOSERV_TOTAL[1,0]:>12.0f} | {CNOSERV_TOTAL[2,0]:>14.0f} | {CNOSERV_TOTAL[3,0]:>13.0f} |') # Coste total
+        print(f'|   Costes de ruptura   | {CRUPT_TOTAL[0,0]:>14.0f} | {CRUPT_TOTAL[1,0]:>12.0f} | {CRUPT_TOTAL[2,0]:>14.0f} | {CRUPT_TOTAL[3,0]:>13.0f} |') # Coste total
+        print('|_______________________|________________|______________|________________|_______________|')
+        print('\n--- Resultados (Estado Inicial Mes 0) ---')
+        print('_________________________________________________________________________________________________________')
+        print('|                 |                                         Empresa                                       |')
+        print('|   Resultados    |_______________________________________________________________________________________|')
+        print('|                 |      Mercedes      |       Peugeot      |  Penhard-Levassor   |          Mors         |')
+        print('|_________________|____________________|____________________|_____________________|_______________________|')
+        print(f'| Ingresos        | {INGRESOS[0,0]:>18.2f} | {INGRESOS[1,0]:>18.2f} | {INGRESOS[2,0]:>19.2f} | {INGRESOS[3,0]:>21.2f} |')
+        print(f'| Costes totales  | {CTOTAL[0,0]:>18.2f} | {CTOTAL[1,0]:>18.2f} | {CTOTAL[2,0]:>19.2f} | {CTOTAL[3,0]:>21.2f} |')
+        print(f'| Presupuesto     | {PRESUPUESTO[0,0]:>18.2f} | {PRESUPUESTO[1,0]:>18.2f} | {PRESUPUESTO[2,0]:>19.2f} | {PRESUPUESTO[3,0]:>21.2f} |')
+        print('|_________________|____________________|____________________|_____________________|_______________________| \n')
+
+        print(f'\nLa Matriz de Markov es:\n{CM}')
+        print(f'Costes unitarios de almacenamiento: {Calm_unit}')
+        #print(f', El coste fijo es %.2f Francos.',cf); # CF ahora está en la matriz CF
+        if ruptadm == 2:
+            print(f'(ruptadm= 2) El cliente NO espera. Coste unitario ruptura: {Crupt_unit}')
+        else:
+            print(f'(ruptadm= 1) El cliente SÍ espera. Coste unitario no servicio: {Cnoserv_unit}')
+
+    except Exception as e:
+        print(f"\nError al cargar el archivo '{ficheroc}': {e}")
+        print("No se pudo cargar la partida. Saliendo.")
+        exit()
+
+
+# --- Partida Nueva ---
+else: # cargar == 2
+    clc()
+    print('                Introducción de los datos de partida     ')
+    print('____________________________________________________________________________\n')
+    print('\nEste juego está diseñado para cuatro empresas participantes.')
+    print('Las condiciones iniciales de partida serán iguales para cada empresa.')
+    print('Los datos que se introducirán a continuación serán la referencia para empezar la partida.\n')
+
+    print('\nEscriba la duración del juego en meses:')
+    while True:
+        duracion_input = entero_positivo()
+        if duracion_input > 0:
+            duracion = duracion_input
+            break
+        else:
+            print("La duración debe ser mayor que cero.")
+
+    # Dimensionamiento de matrices
+    PRESUPUESTO = np.zeros((n_empresas, duracion + 1))
+    V = np.zeros((n_empresas, duracion + 1), dtype=int)
+    PVP = np.zeros((n_empresas, duracion + 1))
+    CV = np.zeros((n_empresas, duracion + 1))
+    CF = np.zeros((n_empresas, duracion + 1))
+    STOCK = np.zeros((n_empresas, duracion + 1), dtype=int)
+    INGRESOS = np.zeros((n_empresas, duracion + 1))
+    UD = np.zeros((n_empresas, duracion + 1), dtype=int)
+    CTOTAL = np.zeros((n_empresas, duracion + 1))
+    Calm = np.zeros((n_empresas, duracion + 1)) # Coste unitario
+    Cnoserv = np.zeros((n_empresas, duracion + 1)) # Coste unitario
+    Crupt = np.zeros((n_empresas, duracion + 1)) # Coste unitario
+    VENTASPENDIENTES = np.zeros((n_empresas, duracion + 1), dtype=int)
+    Ventasreales = np.zeros((n_empresas, duracion + 1), dtype=int)
+    CRUPT_TOTAL = np.zeros((n_empresas, duracion + 1))
+    CALM_TOTAL = np.zeros((n_empresas, duracion + 1))
+    CNOSERV_TOTAL = np.zeros((n_empresas, duracion + 1))
+    PUB = np.zeros((n_empresas, duracion + 1))
+    mejoras = np.zeros((n_empresas, duracion + 1))
+
+    print('\nEscriba el valor de la demanda total del mercado inicial:')
+    ventasmax = entero_positivo() # Demanda total en el mes 0
+
+    print('\nEscriba el precio de venta al público inicial del producto (precio de referencia):')
+    pvp_inicial = numero_positivo()
+    pvpini = pvp_inicial # Guardar referencia inicial
+
+    # Inicializar ruptadm (se pide dentro del bucle ahora)
+    ruptadm = 0 # Se definirá en el bucle
+
+    # Pedir datos iniciales para cada empresa
+    for i in range(n_empresas):
+        print(f'\n--- Datos Iniciales para {Empresa[i]} ---')
+        print(f'Escriba la cantidad inicial de presupuesto disponible por la empresa {Empresa[i]}:')
+        presupuesto = numero_positivo()
+        PRESUPUESTO[i, 0] = presupuesto
+
+        PVP[i, 0] = pvp_inicial
+
+        print(f'Escriba el coste fijo de la empresa {Empresa[i]}:')
+        cf = numero_positivo()
+        CF[i, 0] = cf
+        # Asumir que el coste fijo es constante para toda la simulación
+        CF[i, 1:] = cf
+
+        print(f'Escriba el coste variable por cada unidad fabricada de la empresa {Empresa[i]}:')
+        cv = numero_positivo()
+        CV[i, 0] = cv
+
+        print(f'Escriba el coste de almacenamiento por unidad de la empresa {Empresa[i]}:')
+        calm = numero_positivo()
+        Calm[i, :] = calm # Coste de almacenamiento constante
+
+        # Preguntar sobre ruptura solo una vez si es igual para todas, o dentro si es por empresa
+        # El código MATLAB lo pide para *cada* empresa, así que lo mantenemos así.
+        print('En caso de ruptura, ¿Se permite entregar el pedido en el siguiente período?')
+        print('1) Escriba 1 en caso afirmativo.')
+        print('2) Escriba 2 en caso contrario.')
+        ruptadm_empresa = uno_o_dos()
+        # Necesitamos una política general, usamos la de la primera empresa o pedimos una general?
+        # El código MATLAB parece usar una única variable 'ruptadm' globalmente después.
+        # Vamos a pedirla una vez fuera del bucle y aplicarla a todas.
+        if i == 0:
+            ruptadm = ruptadm_empresa # Usar la respuesta de la primera empresa para todas
+
+        if ruptadm == 1: # Cliente espera
+            print(f'Escriba el coste de no servicio de la empresa {Empresa[i]}:')
+            cnoserv = numero_positivo()
+            Cnoserv[i, :] = cnoserv # Coste no servicio constante
+            Crupt[i, :] = 0 # No hay coste de ruptura si espera
+        else: # Cliente no espera (ruptadm == 2)
+             print(f'Escriba el coste de ruptura de la empresa {Empresa[i]}:')
+             crupt = numero_positivo()
+             Crupt[i, :] = crupt # Coste ruptura constante
+             Cnoserv[i, :] = 0 # No hay coste no servicio si no espera
 
     # Matriz de Markov inicial (equitativa)
     CM = np.full((n_empresas, n_empresas), 1.0 / n_empresas)

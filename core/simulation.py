@@ -476,6 +476,20 @@ class Simulation:
             ]
         }
         
+    @staticmethod
+    def analizar_tendencias(matriz_ventas: np.ndarray, duracion: int):
+        """
+        Analiza tendencias de ventas mes a mes para cada empresa.
+        matriz_ventas: np.ndarray de shape (empresas, meses+1)
+        duracion: número de meses a analizar (usualmente self.current_month o len(historial))
+        Devuelve una lista de arrays con la diferencia de ventas entre meses consecutivos.
+        """
+        tendencias = []
+        for j in range(duracion):
+            tendencia = matriz_ventas[:, j+1] - matriz_ventas[:, j]
+            tendencias.append(tendencia)
+        return tendencias
+    
     # TODO: Quizás sea útil implementar __str__ o __repr__ para imprimir directamente el estado de la simulación usando matplotlib o pandas.
     # def __str__(self):
     #     """Devuelve una representación en cadena del estado actual de la simulación."""

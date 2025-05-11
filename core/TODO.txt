@@ -78,7 +78,7 @@
 ## Calidad de Código
 [ ] Realizar limpieza general del código (eliminar `print` de depuración, código comentado innecesario).
 [ ] Asegurar un estilo de código consistente (ej: PEP 8).
-[/] Revisar y refactorizar si es necesario para mejorar claridad o eficiencia.
+[ ] Revisar y refactorizar si es necesario para mejorar claridad o eficiencia.
 
 
 # --- Futuro / Opcional ---
