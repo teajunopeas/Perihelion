@@ -11,38 +11,9 @@ import platform
 
 # --- Funciones de Búsqueda y Compilación/Conversión ---
 
-def find_tex_files(directory=".", specific_files=None):
-    """
-    Busca archivos .tex. Si se proporcionan archivos específicos, los filtra.
-
-    Args:
-        directory (str): Directorio para buscar archivos
-        specific_files (list): Lista de nombres de archivos .tex específicos a procesar
-
-    Returns:
-        list: Lista de rutas completas de archivos .tex
-    """
-    # Si no se proporcionan archivos específicos, buscar todos los .tex en el directorio
-    if not specific_files:
-        return glob.glob(os.path.join(directory, "*.tex"))
-
-    # Filtrar archivos específicos
-    filtered_files = []
-    for file in specific_files:
-        # Manejar rutas relativas o nombres de archivo
-        if not file.endswith('.tex'):
-            file += '.tex'
-
-        # Construir ruta completa
-        full_path = os.path.join(directory, file)
-
-        # Verificar si el archivo existe
-        if os.path.exists(full_path):
-            filtered_files.append(full_path)
-        else:
-            print(f"Advertencia: Archivo {full_path} no encontrado.")
-
-    return filtered_files
+def find_tex_files(directory="."):
+    """Busca todos los archivos .tex en el directorio especificado."""
+    return glob.glob(os.path.join(directory, "*.tex"))
 
 
 def find_executable(name):
@@ -243,19 +214,12 @@ def clean_auxiliary_files(base_name, keep_tex=True, delete_intermediate_pdf=Fals
 
 
 # --- Lógica Principal de Procesamiento ---
-def process_tex_files(directory=".", specific_files=None, target='svg',
-                      clean_enabled=True, keep_tex=True,
-                      keep_pdf_intermediate=False, keep_dvi_intermediate=False,
-                      force_overwrite=False, workflow_info=None):
-    """
-    Procesa archivos .tex en el directorio o la lista específica.
-    Args:
-        directory (str): Directorio donde buscar si no se da lista.
-        specific_files (list): Lista de archivos .tex concretos a procesar.
-        ...
-    """
-    # Ahora respetamos specific_files
-    tex_files = find_tex_files(directory, specific_files)
+def process_tex_files(directory=".", target='svg', clean_enabled=True, keep_tex=True,
+                      keep_pdf_intermediate=False, keep_dvi_intermediate=False,  # Nuevo para DVI
+                      force_overwrite=False,
+                      workflow_info=None):  # Contendrá la info del flujo decidido
+    """Procesa todos los archivos .tex en el directorio según el flujo y objetivo."""
+    tex_files = find_tex_files(directory)
     if not tex_files:
         print(f"No se encontraron archivos .tex en '{os.path.abspath(directory)}'")
         return
@@ -585,14 +549,12 @@ def check_dependencies(target='svg', use_inkscape_preference=True, inkscape_path
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convierte archivos LaTeX (.tex) al formato objetivo (SVG o PDF) y limpia archivos auxiliares.",
+        description="Convierte archivos LaTeX (.tex) al formato objetivo (SVG o PDF) y limpia archivos auxiliares. También permite convertir directamente archivos .pdf o .dvi a .svg.",
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
-        "-d", "--directory_or_files",
-        nargs="+",
-        default=["."],
-        help="Directorio raíz o lista de archivos .tex a procesar"
+        "-d", "--directory", default=".",
+        help="Directorio donde buscar archivos .tex, .pdf o .dvi (por defecto: directorio actual)."
     )
     parser.add_argument(
         "--target", choices=['svg', 'pdf'], default='svg',
@@ -603,6 +565,10 @@ def main():
     parser.add_argument(
         "--force", action="store_true",
         help="Forzar la regeneración del archivo objetivo aunque ya exista."
+    )
+    parser.add_argument(
+        "--from-intermediate", nargs="?", const=True, default=None,
+        help="Convierte directamente uno o todos los archivos .pdf/.dvi a .svg (no requiere .tex). Si no se especifica archivo, procesa todos los .pdf y .dvi del directorio."
     )
 
     # Nuevo argumento para forzar un flujo de trabajo específico
@@ -615,6 +581,7 @@ def main():
              "  pdflatex-pdf2svg: Forzar conversión pdflatex -> PDF -> pdf2svg -> SVG\n"
              "  latex-dvisvgm: Forzar conversión latex -> DVI -> dvisvgm -> SVG"
     )
+
     clean_group = parser.add_argument_group('Opciones de Limpieza')
     clean_group.add_argument(
         "--no-clean", action="store_false", dest="clean", default=True,
@@ -649,8 +616,67 @@ def main():
         "--inkscape-path", default=None,
         help="Ruta explícita al ejecutable de Inkscape."
     )
-
     args = parser.parse_args()
+
+    # --- NUEVO: Si se usa --from-intermediate, convertir uno o todos los archivos intermedios ---
+    if args.from_intermediate is not None:
+        # Si se pasa un archivo concreto: --from-intermediate archivo.pdf
+        if isinstance(args.from_intermediate, str):
+            files_to_convert = [os.path.join(args.directory, args.from_intermediate)]
+        else:
+            # Si solo se pasa --from-intermediate, buscar todos los .pdf y .dvi
+            files_to_convert = sorted(glob.glob(os.path.join(args.directory, "*.pdf")))
+            files_to_convert += sorted(glob.glob(os.path.join(args.directory, "*.dvi")))
+
+        if not files_to_convert:
+            print(f"No se encontraron archivos .pdf ni .dvi en '{os.path.abspath(args.directory)}'")
+            sys.exit(1)
+
+        total = len(files_to_convert)
+        ok_count = 0
+        for input_file in files_to_convert:
+            if not os.path.isfile(input_file):
+                print(f"Error: El archivo '{input_file}' no existe.")
+                continue
+            ext = os.path.splitext(input_file)[1].lower()
+            output_svg = os.path.splitext(input_file)[0] + ".svg"
+            if os.path.exists(output_svg) and not args.force:
+                print(f"El archivo de salida '{output_svg}' ya existe. Usa --force para sobrescribir.")
+                continue
+            if ext == ".pdf":
+                inkscape_exe = find_executable("inkscape")
+                pdf2svg_exe = find_executable("pdf2svg")
+                if inkscape_exe:
+                    print(f"Convirtiendo {input_file} a SVG con Inkscape...")
+                    ok = convert_pdf_to_svg_with_inkscape(input_file, inkscape_exe=inkscape_exe)
+                elif pdf2svg_exe:
+                    print(f"Convirtiendo {input_file} a SVG con pdf2svg...")
+                    ok = convert_pdf_to_svg_with_pdf2svg(input_file, pdf2svg_exe=pdf2svg_exe)
+                else:
+                    print("No se encontró ni Inkscape ni pdf2svg en el sistema.")
+                    continue
+                if ok and os.path.exists(output_svg):
+                    print(f"¡Conversión exitosa! SVG guardado en: {output_svg}")
+                    ok_count += 1
+                else:
+                    print(f"No se pudo completar la conversión de {input_file} a SVG.")
+            elif ext == ".dvi":
+                dvisvgm_exe = find_executable("dvisvgm")
+                if dvisvgm_exe:
+                    print(f"Convirtiendo {input_file} a SVG con dvisvgm...")
+                    ok = convert_dvi_to_svg(input_file, dvi2svg_exe=dvisvgm_exe)
+                else:
+                    print("No se encontró dvisvgm en el sistema.")
+                    continue
+                if ok and os.path.exists(output_svg):
+                    print(f"¡Conversión exitosa! SVG guardado en: {output_svg}")
+                    ok_count += 1
+                else:
+                    print(f"No se pudo completar la conversión de {input_file} a SVG.")
+            else:
+                print(f"El archivo '{input_file}' debe ser .pdf o .dvi para conversión directa a SVG.")
+        print(f"\nResumen: {ok_count} de {total} archivos intermedios convertidos correctamente a SVG.")
+        return
 
     # --- Comprobación de dependencias y determinación del flujo ---
     workflow_info = check_dependencies(
@@ -664,85 +690,41 @@ def main():
         print("Saliendo debido a dependencias faltantes para el flujo de trabajo requerido.")
         sys.exit(1)
 
-    # --- Mostrar configuración (ajustada a los nuevos nombres) ---
+    # --- Mostrar configuración ---
     print("\n--- Configuración del Proceso ---")
-    # Usamos la variable `directory` que definiremos justo después
-    # (se inicializa un poco más abajo en la lógica de paths)
-    # Por ahora imprimimos las opciones estáticas:
+    print(f"Directorio de trabajo: {os.path.abspath(args.directory)}")
     print(f"Objetivo final (--target): {args.target.upper()}")
     print(f"Flujo de trabajo: {workflow_info['name']}")
-
+    # Mostrar si el flujo fue forzado o detectado automáticamente
     if args.workflow != 'auto':
         print(f"  (Flujo forzado mediante --workflow={args.workflow})")
 
-    if 'pdflatex_exe' in workflow_info:
-        print(f"  pdflatex: {workflow_info['pdflatex_exe']}")
-    if 'latex_exe' in workflow_info:
-        print(f"  latex:    {workflow_info['latex_exe']}")
-
-    if 'pdf_converter_exe' in workflow_info:
-        print(f"  Convertidor PDF->SVG: {workflow_info['pdf_converter_exe']}")
-
-    if 'dvi_converter_exe' in workflow_info:
-        print(f"  Convertidor DVI->SVG: {workflow_info['dvi_converter_exe']}")
+    if 'pdflatex_exe' in workflow_info: print(f"  pdflatex: {workflow_info['pdflatex_exe']}")
+    if 'latex_exe' in workflow_info: print(f"  latex: {workflow_info['latex_exe']}")
+    if 'pdf_converter_exe' in workflow_info: print(f"  Convertidor PDF->SVG: {workflow_info['pdf_converter_exe']}")
+    if 'dvi_converter_exe' in workflow_info: print(f"  Convertidor DVI->SVG: {workflow_info['dvi_converter_exe']}")
 
     print(f"Forzar sobreescritura (--force): {'Sí' if args.force else 'No'}")
     print(f"Limpiar archivos (--no-clean): {'Sí' if args.clean else 'No'}")
-
     if args.clean:
         if args.target == 'svg':
             if "PDFLATEX" in workflow_info['name']:
                 print(f"  - Mantener PDF intermedio (--keep-pdf): {'Sí' if args.keep_pdf_intermediate else 'No'}")
-        if "LATEX_DVI2SVG" in workflow_info['name']:
-            print(f"  - Mantener DVI intermedio (--keep-dvi): {'Sí' if args.keep_dvi_intermediate else 'No'}")
-        print(f"  - Conservar .tex original (--remove-tex): {'Sí' if args.keep_tex else 'No'}")
+            if "LATEX_DVI2SVG" in workflow_info['name']:
+                print(f"  - Mantener DVI intermedio (--keep-dvi): {'Sí' if args.keep_dvi_intermediate else 'No'}")
+        print(f"  - Eliminar .TEX original (--remove-tex): {'Sí' if not args.keep_tex else 'No'}")
 
-    # 1) Separa rutas de directorios vs ficheros .tex
-    input_paths = args.directory_or_files
-    dir_paths = [p for p in input_paths if os.path.isdir(p)]
-    file_paths = [p for p in input_paths if p.endswith('.tex') and os.path.isfile(p)]
-
-    # 2) Decide qué procesar
-    if dir_paths and not file_paths:
-        # Solo directorios: procesa recursivamente el primero
-        directory = dir_paths[0]
-        specific_files = None
-    elif file_paths and not dir_paths:
-        # Solo ficheros: procesa solo esos
-        directory = os.getcwd()
-        specific_files = file_paths
-    else:
-        # Mezcla: expande cada directorio + añade archivos sueltos
-        specific_files = []
-        for d in dir_paths:
-            specific_files.extend(find_tex_files(d, None))
-
-        specific_files.extend([os.path.abspath(f) for f in file_paths])
-        directory = os.getcwd()
-
-      # 3) Feedback al usuario
-
-    if specific_files is None:
-        print(f"Procesando todos los .tex en el directorio: {os.path.abspath(directory)}")
-    else:
-        print(f"Procesando {len(specific_files)} archivo(s) .tex concreto(s):")
-        for f in specific_files:
-            print("  -", f)
-
-    # 4) Llamada unificada a process_tex_files
+    # --- Ejecutar procesamiento ---
     process_tex_files(
-        directory = directory,
-        specific_files = specific_files,
-        target = args.target,
-        clean_enabled = args.clean,
-        keep_tex = args.keep_tex,
-        keep_pdf_intermediate = args.keep_pdf_intermediate,
-        keep_dvi_intermediate = args.keep_dvi_intermediate,
-        force_overwrite = args.force,
-        workflow_info = workflow_info
+        directory=args.directory,
+        target=args.target,
+        clean_enabled=args.clean,
+        keep_tex=args.keep_tex,
+        keep_pdf_intermediate=args.keep_pdf_intermediate,
+        keep_dvi_intermediate=args.keep_dvi_intermediate,
+        force_overwrite=args.force,
+        workflow_info=workflow_info
     )
-
-
 
 
 if __name__ == "__main__":
