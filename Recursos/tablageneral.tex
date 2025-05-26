@@ -1,0 +1,44 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{eurosym}
+\usepackage{float} % Para la opción [H] en tables
+
+\sisetup{
+	output-decimal-marker = {.},
+	group-separator = {,},
+	group-minimum-digits = 4,
+	detect-all,
+	detect-weight = true,
+	detect-family = true
+}
+
+\begin{document}
+	\leavevmode % Previene errores de caja vacía con standalone
+	
+	\begin{minipage}{0.96\linewidth}
+		\centering
+		
+		\textbf{Resumen financiero acumulado por empresa (meses 0--4)}
+		\begin{tabular}{@{}lrrrr@{}}
+			\toprule
+			\textbf{Indicador}
+			& \textbf{Mercedes}
+			& \textbf{Peugeot}
+			& \textbf{Penhard-L.}
+			& \textbf{Mors} \\
+			\midrule
+			Beneficio bruto & 5127500.00 & 4408500.00 & 4189900.00 &  4215500.00 \\
+			Costes brutos & 6127814.06  & 4665192.59 & 3972231.51 & 3370328.97 \\
+			%Inversión tecnologia & 142000 & 123000 & 96200 & 165800 \\
+			Presupuesto final & 4299685.95  & 4243307.41 & 3217668.49 & 3545171.04 \\
+			\bottomrule
+		\end{tabular}
+	\end{minipage}
+	
+	
+\end{document}

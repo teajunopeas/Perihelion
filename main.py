@@ -1,7 +1,6 @@
 # Importaciones
 from utils import *
 from core import *
-from utils import *
 import numpy as np
 
 # Constantes y configuración inicial
@@ -26,7 +25,7 @@ def get_initial_config():
     """Solicita al usuario los valores iniciales para la simulación."""
     print("\n=== Configuración Inicial ===")
     opciones = ["Cargar partida guardada", "Iniciar nueva simulación"]
-    return Unodos(opciones=opciones) # type: ignore
+    return Unodos(choose_btwn=opciones) # type: ignore
 
 def create_new_simulation():
     """Crea una nueva simulación con valores predeterminados."""

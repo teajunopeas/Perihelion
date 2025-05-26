@@ -115,6 +115,55 @@ class Simulation:
         # if not np.allclose(final_col_sums, 1.0):
         #     print("Error crítico: La normalización de la matriz de Markov falló.")
 
+    # Placeholder para la lógica de actualización de la matriz de Markov
+    def _update_markov_matrix(self) -> None:
+        """Actualiza la matriz de Markov basada en las decisiones de las empresas."""
+        # Placeholder: No hacer cambios, mantener la matriz como está
+        pass
+
+    def _calculate_equilibrium(self) -> np.ndarray:
+        """Calcula el vector de equilibrio de la matriz de Markov."""
+        # Placeholder: Distribuir la demanda uniformemente
+        return np.full(self.num_empresas, 1.0 / self.num_empresas)
+
+    def _distribute_demand(self, market_share_vector: np.ndarray) -> np.ndarray:
+        """Distribuye la demanda total según las cuotas de mercado."""
+        # Placeholder: Distribuir la demanda proporcionalmente
+        demand_per_company = market_share_vector * self.market_demand
+        return np.round(demand_per_company).astype(int)
+
+    def _update_market_demand(self) -> None:
+        """Actualiza la demanda total del mercado para el próximo mes."""
+        # Placeholder: Mantener la demanda constante
+        pass
+
+    def _get_company_decisions(self) -> None:
+        """Obtiene o simula las decisiones de cada empresa para el mes actual."""
+        # Placeholder: No hacer cambios en las decisiones
+        pass
+
+    def _apply_tech_effect_on_costs(self) -> None:
+        """Aplica el efecto de la inversión en tecnología sobre los costes variables."""
+        # Placeholder: No modificar los costes
+        pass
+
+
+    def _validar_y_normalizar_matriz_markov(self, matriz: Optional[np.ndarray] = None) -> None:
+        """Asegura que la matriz de Markov sea válida (columnas suman 1)."""
+        if matriz is None:
+            matriz = self.markov_matrix
+
+        # Comprobar valores negativos
+        if np.any(matriz < 0):
+            raise ValueError("La matriz de Markov no puede tener valores negativos")
+
+        # Normalizar columnas para que sumen 1
+        sumas_columnas = matriz.sum(axis=0)
+        for j in range(matriz.shape[1]):
+            if sumas_columnas[j] == 0:
+                matriz[:, j] = 1.0 / matriz.shape[0]  # Distribución uniforme si suma es 0
+            else:
+                matriz[:, j] = matriz[:, j] / sumas_columnas[j]
 
     def _update_markov_matrix(self) -> None:
         """
@@ -272,20 +321,15 @@ class Simulation:
 
     def _guardar_estado_historial(self) -> None:
         """Guarda el estado actual relevante en las listas de historial."""
-        try:
-            cuotas = self._calculate_equilibrium()
-            for i, empresa in enumerate(self.empresas):
-                self.historial_presupuesto[i].append(empresa.presupuesto)
-                self.historial_stock[i].append(empresa.stock)
-                self.historial_ventas[i].append(empresa.ventas_reales_mes) # Ventas del mes que acaba de terminar
-                self.historial_cuota_mercado[i].append(cuotas[i])
-            # Guardar copia de la matriz de Markov en el historial
-            if not hasattr(self, 'historial_markov'):
-                self.historial_markov = []
-            self.historial_markov.append(self.markov_matrix.copy())
-        except Exception as e:
-            print(f"Error al guardar historial en mes {self.current_month}: {e}")
-
+        for i, empresa in enumerate(self.empresas):
+            self.historial_presupuesto[i].append(empresa.presupuesto)
+            self.historial_stock[i].append(empresa.stock)
+            self.historial_ventas[i].append(empresa.ventas_reales_mes)
+            # Cuota de mercado actual (simplificada)
+            self.historial_cuota_mercado[i].append(1.0 / self.num_empresas)
+            
+        # Guardar copia de la matriz de Markov actual
+        self.historial_markov.append(self.markov_matrix.copy())
 
     def run_step(self) -> None:
         """Ejecuta un mes (paso) completo de la simulación."""
@@ -391,90 +435,43 @@ class Simulation:
                  print(f"  Cuota Mercado Final (aprox): {self.historial_cuota_mercado[i][-1]:.2%}")
             print("-" * 20)
         # TODO: Añadir más análisis si se desea (beneficio total, etc.)
-
-
     def save_state(self, filepath: str) -> None:
         """Guarda el estado actual completo de la simulación."""
         try:
-            state = {
-                'empresas': [empresa.__dict__ for empresa in self.empresas],
-                'markov_matrix': self.markov_matrix.tolist(),
-                'market_demand': self.market_demand,
-                'current_month': self.current_month,
-                'ruptadm': self.ruptadm,
-                'historial_presupuesto': self.historial_presupuesto,
-                'historial_stock': self.historial_stock,
-                'historial_ventas': self.historial_ventas,
-                'historial_cuota_mercado': self.historial_cuota_mercado,
-                'historial_markov': [matrix.tolist() for matrix in self.historial_markov]
-            }
-            save_to_file(filepath, state)  # type: ignore
+            from utils.file_manager import save_game
+            save_game(self.to_dict(), filepath)
             print(f"Estado guardado exitosamente en {filepath}")
         except Exception as e:
             raise RuntimeError(f"Error al guardar el estado: {e}")
 
-    @classmethod
-    def load_state(cls, filepath: str):
-        """Carga el estado de la simulación desde un archivo y devuelve una nueva instancia."""
-        try:
-            state = load_from_file(filepath) # type: ignore
-            empresas = []
-            ruptadm = state.get('ruptadm', 1)
-            for empresa_dict in state['empresas']:
-                # Reconstruir el config esperado por Company
-                config = {
-                    'nombre': empresa_dict.get('nombre'),
-                    'presupuesto_inicial': empresa_dict.get('presupuesto'),
-                    'pvp_inicial': empresa_dict.get('pvp'),
-                    'coste_fijo_mensual': empresa_dict.get('coste_fijo'),
-                    'coste_variable_unitario': empresa_dict.get('coste_variable'),
-                    'stock_inicial': empresa_dict.get('stock'),
-                    'coste_almacenamiento_unitario': empresa_dict.get('coste_almacenamiento_unitario'),
-                    'coste_ruptura_unitario': empresa_dict.get('coste_ruptura_unitario'),
-                    'coste_no_servicio_unitario': empresa_dict.get('coste_no_servicio_unitario'),
-                }
-                empresa = Company(config, ruptadm)
-                # Restaurar atributos adicionales si es necesario
-                for k, v in empresa_dict.items():
-                    if not hasattr(empresa, k) or k in config:
-                        continue
-                    setattr(empresa, k, v)
-                empresas.append(empresa)
-            sim = cls(empresas, np.array(state['markov_matrix']), state['market_demand'], ruptadm)
-            sim.current_month = state['current_month']
-            sim.historial_presupuesto = state.get('historial_presupuesto', [[] for _ in empresas])
-            sim.historial_stock = state.get('historial_stock', [[] for _ in empresas])
-            sim.historial_ventas = state.get('historial_ventas', [[] for _ in empresas])
-            sim.historial_cuota_mercado = state.get('historial_cuota_mercado', [[] for _ in empresas])
-            sim.historial_markov = [np.array(matrix) for matrix in state.get('historial_markov', [])]
-            print(f"Estado cargado exitosamente desde {filepath}")
-            return sim
-        except Exception as e:
-            print(f"Error al cargar el estado: {e}")
-            return None
-
     def to_dict(self) -> dict:
         """Convierte el estado actual de la simulación en un diccionario."""
-        return {
-            'month': self.current_month,
+        def convert_to_native_types(obj):
+            if isinstance(obj, (np.int_, np.integer)):
+                return int(obj)
+            elif isinstance(obj, (np.float64, np.float32)):
+                return float(obj)
+            elif isinstance(obj, (list, tuple)):
+                return [convert_to_native_types(x) for x in obj]
+            elif isinstance(obj, dict):
+                return {k: convert_to_native_types(v) for k, v in obj.items()}
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return obj
+
+        state = {
+            'empresas': [convert_to_native_types(empresa.__dict__) for empresa in self.empresas],
             'markov_matrix': self.markov_matrix.tolist(),
-            'ruptadm_global': self.ruptadm,
-            'companies': [
-                {
-                    'nombre': company.nombre,
-                    'presupuesto': company.presupuesto,
-                    'pvp': company.pvp,
-                    'coste_fijo': company.coste_fijo,
-                    'coste_variable': company.coste_variable,
-                    'stock': company.stock,
-                    'coste_almacenamiento_unitario': company.coste_almacenamiento_unitario,
-                    'coste_ruptura_unitario': company.coste_ruptura_unitario,
-                    'coste_no_servicio_unitario': company.coste_no_servicio_unitario,
-                    'ventas_reales_mes': company.ventas_reales_mes,
-                }
-                for company in self.empresas
-            ]
+            'market_demand': int(self.market_demand),
+            'current_month': int(self.current_month),
+            'ruptadm': int(self.ruptadm),
+            'historial_presupuesto': convert_to_native_types(self.historial_presupuesto),
+            'historial_stock': convert_to_native_types(self.historial_stock),
+            'historial_ventas': convert_to_native_types(self.historial_ventas),
+            'historial_cuota_mercado': convert_to_native_types(self.historial_cuota_mercado),
+            'historial_markov': [matrix.tolist() for matrix in self.historial_markov]
         }
+        return convert_to_native_types(state)
         
     @staticmethod
     def analizar_tendencias(matriz_ventas: np.ndarray, duracion: int):

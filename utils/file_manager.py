@@ -8,18 +8,17 @@ DEFAULT_FILENAME = "partida.json"
 def validate_filename(filename: str) -> str:
     """
     Valida que el nombre del archivo tenga una extensión .json.
-    Si no tiene extensión, agrega .json.
+    Si tiene otra extensión se reemplaza con .json. Si no tiene extensión, se agrega .json.
     """
-    if not filename.endswith(".json"):
-        filename += ".json"
-    return filename
+    base_name = filename.rsplit('.', 1)[0]  # Get filename without extension
+    return base_name + ".json"
 
-def save_game(simulation, filename: str = DEFAULT_FILENAME) -> None:
+def save_game(state_data, filename: str = DEFAULT_FILENAME) -> None:
     """
     Guarda el estado de la simulación en un archivo JSON.
 
     Args:
-        simulation: Instancia de la clase Simulation.
+        state_data: Diccionario con el estado de la simulación.
         filename: Nombre del archivo donde se guardará la partida (default: partida.json).
 
     Raises:
@@ -35,12 +34,9 @@ def save_game(simulation, filename: str = DEFAULT_FILENAME) -> None:
 
         filepath = os.path.join(data_dir, filename)
 
-        # Obtener el estado de la simulación como diccionario
-        sim_data = simulation.to_dict()
-
         # Guardar en archivo
         with open(filepath, "w", encoding="utf-8") as f:
-            json.dump(sim_data, f, indent=4)
+            json.dump(state_data, f, indent=4)
         print(f"Partida guardada exitosamente en {filepath}")
     except Exception as e:
         raise Exception(f"Error al guardar la partida: {str(e)}")
