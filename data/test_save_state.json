@@ -1,0 +1,64 @@
+{
+    "empresas": [
+        {
+            "nombre": "Empresa Test",
+            "presupuesto": 10000.0,
+            "pvp": 10.0,
+            "coste_fijo": 1000.0,
+            "coste_variable": 5.0,
+            "stock": 100,
+            "coste_almacenamiento_unitario": 1.0,
+            "coste_ruptura_unitario": 2.0,
+            "coste_no_servicio_unitario": 3.0,
+            "ruptadm": 1,
+            "marketing_investment": 0.0,
+            "tech_investment": 0.0,
+            "unidades_a_producir": 0,
+            "ventas_pendientes": 0,
+            "ventas_reales_mes": 0,
+            "ingresos_mes": 0.0,
+            "coste_produccion_mes": 0.0,
+            "coste_almacenamiento_mes": 0.0,
+            "coste_ruptura_mes": 0.0,
+            "coste_no_servicio_mes": 0.0,
+            "coste_marketing_mes": 0.0,
+            "coste_tech_mes": 0.0,
+            "coste_total_mes": 0.0
+        }
+    ],
+    "markov_matrix": [
+        [
+            1.0
+        ]
+    ],
+    "market_demand": 1000,
+    "current_month": 0,
+    "ruptadm": 1,
+    "historial_presupuesto": [
+        [
+            10000.0
+        ]
+    ],
+    "historial_stock": [
+        [
+            100
+        ]
+    ],
+    "historial_ventas": [
+        [
+            0
+        ]
+    ],
+    "historial_cuota_mercado": [
+        [
+            1.0
+        ]
+    ],
+    "historial_markov": [
+        [
+            [
+                1.0
+            ]
+        ]
+    ]
+}

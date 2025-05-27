@@ -57,14 +57,11 @@
         "xtr1common": "cpp",
         "xutility": "cpp"
     },
-    "python.testing.unittestArgs": [
-        "-v",
-        "-s",
-        "./tests",
-        "-p",
-        "test*.py"
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests"
     ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true,
     "python.pythonPath": "c:\\Users\\elian\\OneDrive - Universidad de Las Palmas de Gran Canaria\\Curso 24-25 2do semestre\\MNF\\Perihelion\\venv\\Scripts\\python.exe"
 }

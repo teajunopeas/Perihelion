@@ -18,7 +18,7 @@ class TestSimulation(unittest.TestCase):
                 'coste_almacenamiento_unitario': 1,
                 'coste_ruptura_unitario': 2,
                 'coste_no_servicio_unitario': 3
-            }, ruptadm=1),
+            }, ruptadm_global=1),
             Company({
                 'nombre': 'Empresa B',
                 'presupuesto_inicial': 15000,
@@ -29,7 +29,7 @@ class TestSimulation(unittest.TestCase):
                 'coste_almacenamiento_unitario': 1.5,
                 'coste_ruptura_unitario': 2.5,
                 'coste_no_servicio_unitario': 3.5
-            }, ruptadm=1)
+            }, ruptadm_global=1)
         ]
         self.markov_matrix = np.array([
             [0.8, 0.2],
