@@ -1,4 +1,5 @@
 *.pyc
 *.txt
+*.svg
 .venv
 .condapi
